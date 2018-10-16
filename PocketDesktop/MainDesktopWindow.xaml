@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="512" d:DesignWidth="512" Width="512" Height="512" AllowsTransparency="True" WindowStyle="None" BorderThickness="0" Visibility="Visible" Background="{x:Null}" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
 
-    <Border x:Name="BackgroundBorder" BorderThickness="1" CornerRadius="80,80,80,80" Background="LightBlue" Opacity="0.85">
+    <Border x:Name="BackgroundBorder" BorderThickness="1" CornerRadius="80,80,80,80" Background="LightBlue" Opacity="0.85" Width="512" Height="512">
         <Grid Width="512" Height="512">
             <Border BorderThickness="1" CornerRadius="10,10,10,10" Background="Gray" Margin="100,20,100,445">
                 <Grid Width="312" Height="27">

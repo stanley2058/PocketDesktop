@@ -60,7 +60,7 @@
   <ItemGroup>
     <Compile Include="MainDesktopWindow.xaml.cs">
       <DependentUpon>MainDesktopWindow.xaml</DependentUpon>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="PocketDesktop.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -86,7 +86,7 @@
     <Page Include="MainDesktopWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Page>
   </ItemGroup>
   <ItemGroup>
