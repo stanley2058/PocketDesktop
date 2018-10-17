@@ -1,0 +1,31 @@
+﻿<Window
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PocketDesktop"
+             xmlns:Properties="clr-namespace:PocketDesktop.Properties" x:Class="PocketDesktop.MainDesktopWindow"
+             mc:Ignorable="d" 
+             d:DesignHeight="512" d:DesignWidth="512" Width="512" Height="512" AllowsTransparency="True" WindowStyle="None" BorderThickness="0" Visibility="Visible" Background="{x:Null}" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+
+    <Border x:Name="BackgroundBorder" BorderThickness="1" CornerRadius="80,80,80,80" Background="LightBlue" Opacity="0.85">
+        <Grid Width="512" Height="512">
+            <Border BorderThickness="1" CornerRadius="10,10,10,10" Background="Gray" Margin="100,20,100,445">
+                <Grid Width="312" Height="27">
+                    <Image Source="/resource/magnify.png" Height="31" Width="31" x:Name="SearchIcon" Margin="-188,-2,81,-2">
+                        <Image.Effect>
+                            <DropShadowEffect/>
+                        </Image.Effect>
+                        <Image.RenderTransform>
+                            <TransformGroup>
+                                <RotateTransform Angle="-4.2"/>
+                            </TransformGroup>
+                        </Image.RenderTransform>
+                    </Image>
+                    <TextBox x:Name="SearchInput" HorizontalAlignment="Left" Height="37" Margin="46,-5,0,-5" TextWrapping="Wrap" VerticalAlignment="Top" Width="256" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FFE6E6E6" Text="TEST" FontSize="24" VerticalContentAlignment="Center"/>
+
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
