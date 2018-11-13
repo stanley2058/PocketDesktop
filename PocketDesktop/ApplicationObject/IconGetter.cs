@@ -7,11 +7,18 @@ namespace PocketDesktop.ApplicationObject
 {
     public static class IconGetter
     {
+        private static readonly Bitmap FolderIcon = (Bitmap)Properties.Resources.ResourceManager.GetObject("folder_icon");
         public static BitmapImage GetIconBitmapImage(string path)
         {
-            var icon = Icon.ExtractAssociatedIcon(path);
-            if (icon == null) return null;
-            var bitmap = icon.ToBitmap();
+            //TODO: Fix here, ExtractAssociatedIcon only return 32*32 icon
+            path = path.Replace("/", "\\");
+            var bitmap = FolderIcon;
+            if (!File.GetAttributes(path).HasFlag(FileAttributes.Directory))
+            {
+                var icon = Icon.ExtractAssociatedIcon(path);
+                if (icon == null) return null;
+                bitmap = icon.ToBitmap();
+            }
             using (var memory = new MemoryStream())
             {
                 bitmap.Save(memory, ImageFormat.Png);

@@ -5,25 +5,48 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using AppObj = PocketDesktop.ApplicationObject.ApplicationObject;
 using Brushes = System.Windows.Media.Brushes;
+using Tree = PocketDesktop.FileTree.FileTree;
 
 namespace PocketDesktop
 {
     public partial class MainDesktopWindow
     {
-        private List<List<KeyValuePair<AppObj, Label>>> AppObjList;
+        private readonly List<List<KeyValuePair<AppObj, Label>>> _appObjList;
+        private readonly Tree _fileTree;
 
         public MainDesktopWindow()
         {
             InitializeComponent();
 
-            AppObjList = new List<List<KeyValuePair<AppObj, Label>>>();
-            InitAppIcons();
+            _appObjList = new List<List<KeyValuePair<AppObj, Label>>>();
+            _fileTree = new Tree();
+
             InitMagnify();
+            InitAppIcons();
+
+            ShowPage();
+        }
+
+        private void ShowPage()
+        {
+            int i = 0, j = 0;
+            foreach (var name in _fileTree.GetPageView())
+            {
+                Trace.WriteLine(name);
+            }
+
+            foreach (var name in _fileTree.GetPageView())
+            {
+                _appObjList[i][j++].Key.UpdateInfos(name);
+                if (j != 3) continue;
+                j = 0; ++i;
+            }
         }
 
         private void InitAppIcons()
@@ -45,6 +68,7 @@ namespace PocketDesktop
                         BorderBrush = Brushes.DarkSlateGray,
                         HorizontalContentAlignment = HorizontalAlignment.Center,
                         VerticalContentAlignment = VerticalAlignment.Center,
+                        Visibility = Visibility.Hidden,
                         Background = new SolidColorBrush
                         {
                             Color = Colors.SkyBlue,
@@ -58,6 +82,7 @@ namespace PocketDesktop
                         Width = 100,
                         Margin = new Thickness(0)
                     };
+                    app.SourceUpdated += AppSourceUpdate;
 
                     var border = new Border
                     {
@@ -80,7 +105,7 @@ namespace PocketDesktop
                     Grid.SetRow(border, i);
                     list.Add(new KeyValuePair<AppObj, Label>(app, label));
                 }
-                AppObjList.Add(list);
+                _appObjList.Add(list);
             }
         }
 
@@ -90,12 +115,20 @@ namespace PocketDesktop
 
             if (!(VisualTreeHelper.GetChild(border, 0) is Grid grid)) return;
             for (var i = 0; i < VisualTreeHelper.GetChildrenCount(grid); i++)
-            {
-                var child = VisualTreeHelper.GetChild(grid, i);
-                if (child is AppObj app)
-                {
+                if (VisualTreeHelper.GetChild(grid, i) is AppObj app)
                     app.StartApp();
-                }
+        }
+
+        private static void AppSourceUpdate(object sender, DataTransferEventArgs e)
+        {
+            if (!(sender is AppObj appObj)) return;
+            if (!(appObj.Parent is Grid grid)) return;
+            for (var i = 0; i < VisualTreeHelper.GetChildrenCount(grid); i++)
+            {
+                if (!(VisualTreeHelper.GetChild(grid, i) is Label label)) continue;
+                var name = appObj.GetName() ?? "";
+                label.Content = name;
+                label.Visibility = name.Equals("") ? Visibility.Hidden : Visibility.Visible;
             }
         }
 
@@ -122,11 +155,13 @@ namespace PocketDesktop
             Trace.WriteLine(e.Delta);
             if (e.Delta > 0) // Wheel up
             {
-                // TODO: Move apps down 1 block
+                _fileTree.PrevLine();
+                ShowPage();
             }
             else // Wheel down
             {
-                // TODO: Move apps up 1 block
+                _fileTree.NextLine();
+                ShowPage();
             }
         }
     }

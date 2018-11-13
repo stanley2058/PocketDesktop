@@ -61,7 +61,6 @@
     <Compile Include="ApplicationObject\ApplicationObject.cs" />
     <Compile Include="ApplicationObject\IconGetter.cs" />
     <Compile Include="FileTree\FileTree.cs" />
-    <Compile Include="FileTree\TreeNode.cs" />
     <Compile Include="MainDesktopWindow.xaml.cs">
       <DependentUpon>MainDesktopWindow.xaml</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -77,6 +76,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="TreeNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -114,6 +114,8 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="resource\folder-icon.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

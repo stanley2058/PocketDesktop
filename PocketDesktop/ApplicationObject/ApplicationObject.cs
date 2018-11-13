@@ -6,31 +6,27 @@ namespace PocketDesktop.ApplicationObject
 {
     public class ApplicationObject : Image
     {
-        private string AppPath;
-
-        public ApplicationObject()
-        {
-        }
+        private string _appPath;
 
         public void UpdateInfos(string appPath)
         {
-            AppPath = appPath;
+            _appPath = appPath;
             Source = IconGetter.GetIconBitmapImage(appPath);
         }
 
         public string GetName()
         {
-            return Path.GetFileNameWithoutExtension(AppPath);
+            return Path.GetFileNameWithoutExtension(_appPath);
         }
 
         public bool IsDir()
         {
-            return File.GetAttributes(AppPath).HasFlag(FileAttributes.Directory);
+            return File.GetAttributes(_appPath).HasFlag(FileAttributes.Directory);
         }
 
         public void StartApp()
         {
-            Trace.WriteLine("Started!");
+            Trace.WriteLine($"Starting {GetName()}");
         }
     }
 }
