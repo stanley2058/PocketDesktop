@@ -4,9 +4,34 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PocketDesktop"
-             xmlns:Properties="clr-namespace:PocketDesktop.Properties" x:Class="PocketDesktop.MainDesktopWindow"
+             xmlns:Properties="clr-namespace:PocketDesktop.Properties"
+             x:Class="PocketDesktop.MainDesktopWindow"
              mc:Ignorable="d" 
              d:DesignHeight="512" d:DesignWidth="512" Width="512" Height="512" AllowsTransparency="True" WindowStyle="None" BorderThickness="0" Visibility="Visible" Background="{x:Null}" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+
+    <Window.Resources>
+        <Style  x:Key="RoundLabel" TargetType="Label">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Label}">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                Background="{TemplateBinding Background}" 
+                                Padding="{TemplateBinding Padding}" 
+                                SnapsToDevicePixels="true" 
+                                CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
 
     <Border x:Name="BackgroundBorder" BorderThickness="1" CornerRadius="80,80,80,80" Background="LightBlue" Opacity="0.85" Width="512" Height="512">
         <Grid Width="512" Height="512">
@@ -22,10 +47,22 @@
                             </TransformGroup>
                         </Image.RenderTransform>
                     </Image>
-                    <TextBox x:Name="SearchInput" HorizontalAlignment="Left" Height="37" Margin="46,-5,0,-5" TextWrapping="Wrap" VerticalAlignment="Top" Width="256" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FFE6E6E6" Text="TEST" FontSize="24" VerticalContentAlignment="Center"/>
+                    <TextBox x:Name="SearchInput" HorizontalAlignment="Left" Height="37" Margin="46,-5,0,-5" TextWrapping="Wrap" VerticalAlignment="Top" Width="256" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" Text="TEST" FontSize="24" VerticalContentAlignment="Center" SelectionBrush="Blue" BorderThickness="0"/>
 
                 </Grid>
             </Border>
+            <Grid x:Name="AppPanel" Margin="30,80,30,35" MouseWheel="AppPanel_MouseWheel" Background="LightBlue" IsManipulationEnabled="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+            </Grid>
         </Grid>
     </Border>
 </Window>

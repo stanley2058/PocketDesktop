@@ -58,6 +58,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplicationObject\ApplicationObject.cs" />
+    <Compile Include="ApplicationObject\IconGetter.cs" />
+    <Compile Include="FileTree\FileTree.cs" />
+    <Compile Include="FileTree\TreeNode.cs" />
     <Compile Include="MainDesktopWindow.xaml.cs">
       <DependentUpon>MainDesktopWindow.xaml</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -110,5 +114,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
