@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -35,15 +33,25 @@ namespace PocketDesktop
 
         private void ShowPage()
         {
+            foreach (var list in _appObjList)
+            {
+                foreach (var pair in list)
+                {
+                    pair.Key.Clear();
+                    pair.Value.Content = "";
+                    pair.Value.ToolTip = "";
+                    pair.Value.Visibility = Visibility.Hidden;
+                }
+            }
+
             int i = 0, j = 0;
             foreach (var name in _fileTree.GetPageView())
             {
-                Trace.WriteLine(name);
-            }
-
-            foreach (var name in _fileTree.GetPageView())
-            {
-                _appObjList[i][j++].Key.UpdateInfos(name);
+                _appObjList[i][j].Key.UpdateInfos(name);
+                var lTitle = _appObjList[i][j].Key.GetName() ?? "";
+                _appObjList[i][j].Value.Content = lTitle;
+                _appObjList[i][j].Value.ToolTip = lTitle;
+                _appObjList[i][j++].Value.Visibility = lTitle.Equals("") ? Visibility.Hidden : Visibility.Visible;
                 if (j != 3) continue;
                 j = 0; ++i;
             }
@@ -72,7 +80,7 @@ namespace PocketDesktop
                         Background = new SolidColorBrush
                         {
                             Color = Colors.SkyBlue,
-                            Opacity = 0.75
+                            Opacity = 0.5
                         }
                     };
 
@@ -82,7 +90,6 @@ namespace PocketDesktop
                         Width = 100,
                         Margin = new Thickness(0)
                     };
-                    app.SourceUpdated += AppSourceUpdate;
 
                     var border = new Border
                     {
@@ -103,33 +110,26 @@ namespace PocketDesktop
                     AppPanel.Children.Add(border);
                     Grid.SetColumn(border, j);
                     Grid.SetRow(border, i);
+                    Panel.SetZIndex(label, 2);
+                    Panel.SetZIndex(app, 1);
                     list.Add(new KeyValuePair<AppObj, Label>(app, label));
                 }
                 _appObjList.Add(list);
             }
         }
 
-        private static void MouseClickOnApp(object sender, MouseButtonEventArgs e)
+        private void MouseClickOnApp(object sender, MouseButtonEventArgs e)
         {
             if (!(sender is Border border)) return;
 
             if (!(VisualTreeHelper.GetChild(border, 0) is Grid grid)) return;
             for (var i = 0; i < VisualTreeHelper.GetChildrenCount(grid); i++)
                 if (VisualTreeHelper.GetChild(grid, i) is AppObj app)
-                    app.StartApp();
-        }
-
-        private static void AppSourceUpdate(object sender, DataTransferEventArgs e)
-        {
-            if (!(sender is AppObj appObj)) return;
-            if (!(appObj.Parent is Grid grid)) return;
-            for (var i = 0; i < VisualTreeHelper.GetChildrenCount(grid); i++)
-            {
-                if (!(VisualTreeHelper.GetChild(grid, i) is Label label)) continue;
-                var name = appObj.GetName() ?? "";
-                label.Content = name;
-                label.Visibility = name.Equals("") ? Visibility.Hidden : Visibility.Visible;
-            }
+                    if (!app.StartApp())
+                    {
+                        _fileTree.OpenDir(app.GetPath());
+                        ShowPage();
+                    }
         }
 
         private void InitMagnify()
@@ -152,7 +152,6 @@ namespace PocketDesktop
 
         private void AppPanel_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            Trace.WriteLine(e.Delta);
             if (e.Delta > 0) // Wheel up
             {
                 _fileTree.PrevLine();
@@ -163,6 +162,29 @@ namespace PocketDesktop
                 _fileTree.NextLine();
                 ShowPage();
             }
+        }
+
+        private void AppPanel_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (_fileTree.IsSearchPage())
+            {
+                SearchInput.Text = "";
+                _fileTree.UnSearch();
+            }
+            else
+                _fileTree.GoBackDir();
+            ShowPage();
+        }
+
+        private void SearchInput_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (SearchInput.Text.Equals(""))
+            {
+                _fileTree.UnSearch();
+            }
+            else
+                _fileTree.Search(SearchInput.Text);
+            ShowPage();
         }
     }
 }

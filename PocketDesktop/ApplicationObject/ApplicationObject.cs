@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Controls;
 
@@ -12,21 +13,41 @@ namespace PocketDesktop.ApplicationObject
         {
             _appPath = appPath;
             Source = IconGetter.GetIconBitmapImage(appPath);
+            ToolTip = GetPath();
         }
 
-        public string GetName()
-        {
-            return Path.GetFileNameWithoutExtension(_appPath);
-        }
+        public string GetName() => Path.GetFileNameWithoutExtension(_appPath);
+
+        public string GetPath() => _appPath;
 
         public bool IsDir()
         {
-            return File.GetAttributes(_appPath).HasFlag(FileAttributes.Directory);
+            if (_appPath.EndsWith(".lnk"))
+                _appPath = IconGetter.GetExePathFromInk(_appPath);
+
+            try
+            {
+                return File.GetAttributes(_appPath).HasFlag(FileAttributes.Directory);
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.Message);
+                return false;
+            }
         }
 
-        public void StartApp()
+        public void Clear()
         {
-            Trace.WriteLine($"Starting {GetName()}");
+            _appPath = null;
+            Source = null;
+            ToolTip = null;
+        }
+
+        public bool StartApp() // return ture if start successfully
+        {
+            if (IsDir()) return false;
+            Process.Start(_appPath);
+            return true;
         }
     }
 }

@@ -8,11 +8,12 @@ namespace PocketDesktop
         [STAThread]
         public static void Main(string[] args)
         {
-            var currentDir = Environment.CurrentDirectory;
-            if (!Directory.Exists(currentDir + "/PocketDesktop"))
-                Directory.CreateDirectory(currentDir + "/PocketDesktop");
+            if (!Directory.Exists(WorkFolder))
+                Directory.CreateDirectory(WorkFolder);
 
             new System.Windows.Application().Run(new MainDesktopWindow());
         }
+
+        public static readonly string WorkFolder = Environment.CurrentDirectory + "/PocketDesktop/";
     }
 }
