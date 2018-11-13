@@ -163,14 +163,17 @@ namespace PocketDesktop.FileTree
                     {
                         try
                         {
-                            if (File.GetAttributes(IconGetter.GetExePathFromInk(fileName)).HasFlag(FileAttributes.Directory))
+                            if (File.GetAttributes(IconGetter.GetExePathFromInk(fileName))
+                                .HasFlag(FileAttributes.Directory))
+                            {
                                 lnkDir.Add(fileName);
+                                continue;
+                            }
                         }
                         catch (Exception e)
                         {
                             Console.WriteLine(e);
                         }
-                        continue;
                     }
                     parent.Append(new TreeNode<string>(parent, new List<TreeNode<string>>(), fileName.Replace("\\", "/")));
                 }
