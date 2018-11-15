@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 
 namespace PocketDesktop
 {
@@ -7,13 +8,18 @@ namespace PocketDesktop
         public SettingMenu()
         {
             InitializeComponent();
-            Visibility = Visibility.Hidden;
+            Hide();
             Topmost = true;
         }
 
         private void BtnClose_Click(object sender, RoutedEventArgs e)
         {
-            Visibility = Visibility.Hidden;
+            Hide();
+        }
+
+        private void BtnExit_OnClick(object sender, RoutedEventArgs e)
+        {
+            Environment.Exit(0);
         }
     }
 }

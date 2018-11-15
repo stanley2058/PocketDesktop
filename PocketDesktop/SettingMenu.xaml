@@ -8,6 +8,7 @@
         mc:Ignorable="d"
         d:DesignHeight="300" d:DesignWidth="450" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True" Width="450" Height="300" BorderThickness="2" BorderBrush="DarkBlue">
     <Grid Background="LightSteelBlue">
-        <Button Name="BtnClose" Height="30" Width="70" Content="Close" FontSize="18" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10, 10" Foreground="Black" Click="BtnClose_Click"></Button>
+        <Button x:Name="BtnClose" Height="30" Width="70" Content="Close" FontSize="18" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,100,10" Foreground="Black" Click="BtnClose_Click"/>
+        <Button x:Name="BtnExit" Height="30" Width="70" Content="Exit" FontSize="18" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" Foreground="Black" Click="BtnExit_OnClick"/>
     </Grid>
 </Window>

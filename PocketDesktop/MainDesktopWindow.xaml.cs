@@ -1,14 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using Shortcut;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using AppObj = PocketDesktop.ApplicationObject.ApplicationObject;
 using Brushes = System.Windows.Media.Brushes;
+using HorizontalAlignment = System.Windows.HorizontalAlignment;
+using Image = System.Windows.Controls.Image;
+using Label = System.Windows.Controls.Label;
+using Panel = System.Windows.Controls.Panel;
 using Tree = PocketDesktop.FileTree.FileTree;
 
 namespace PocketDesktop
@@ -17,19 +23,68 @@ namespace PocketDesktop
     {
         private readonly List<List<KeyValuePair<AppObj, Label>>> _appObjList;
         private readonly Tree _fileTree;
-        private SettingMenu _settingMenu;
+        private readonly SettingMenu _settingMenu;
+        private readonly HotkeyBinder _hotkeyBinder;
+        private bool _initFlag;
 
         public MainDesktopWindow()
         {
             InitializeComponent();
+            Visibility = Visibility.Hidden;
+            _initFlag = true;
 
             _appObjList = new List<List<KeyValuePair<AppObj, Label>>>();
             _fileTree = new Tree();
             _settingMenu = new SettingMenu();
+            _hotkeyBinder = new HotkeyBinder();
 
-            InitMagnify();
+            InitImage(SearchIcon, "magnify");
+            InitImage(SettingGearImg, "gear");
             InitAppIcons();
 
+            ShowPage();
+            SearchInput.Focus();
+            BindHotKey();
+        }
+
+        private void BindHotKey()
+        {
+            _hotkeyBinder.Bind(Modifiers.Shift ^ Modifiers.Win, Keys.D).To(() =>
+            {
+                if (!IsVisible || _initFlag)
+                    Show();
+                else
+                    Hide();
+            });
+        }
+
+        private void UnBindHotKey()
+        {
+            if (_hotkeyBinder.IsHotkeyAlreadyBound(new Hotkey(Modifiers.None, Keys.Escape)))
+                _hotkeyBinder.Unbind(Modifiers.None, Keys.Escape);
+        }
+
+        private new void Show()
+        {
+            if (_initFlag)
+            {
+                Visibility = Visibility.Visible;
+                _initFlag = false;
+            }
+            _hotkeyBinder.Bind(Modifiers.None, Keys.Escape).To(EscapeKeyEvent);
+            base.Show();
+        }
+
+        private new void Hide()
+        {
+            UnBindHotKey();
+            base.Hide();
+        }
+
+        private void EscapeKeyEvent()
+        {
+            SearchInput.Text = "";
+            _fileTree.GoHome();
             ShowPage();
         }
 
@@ -132,15 +187,12 @@ namespace PocketDesktop
                         _fileTree.OpenDir(app.GetPath());
                         ShowPage();
                     }
-                    else
-                    {
-                        Visibility = Visibility.Hidden;
-                    }
+                    else Hide();
         }
 
-        private void InitMagnify()
+        private static void InitImage(Image toMod, string prop)
         {
-            var bitmap = (Bitmap)Properties.Resources.ResourceManager.GetObject("magnify");
+            var bitmap = (Bitmap)Properties.Resources.ResourceManager.GetObject(prop);
             if (bitmap == null) return;
             using (var memory = new MemoryStream())
             {
@@ -152,7 +204,7 @@ namespace PocketDesktop
                 bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
                 bitmapImage.EndInit();
 
-                SearchIcon.Source = bitmapImage;
+                toMod.Source = bitmapImage;
             }
         }
 
@@ -188,7 +240,7 @@ namespace PocketDesktop
 
         private void SettingGear_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            _settingMenu.Visibility = Visibility.Visible;
+            _settingMenu.Show();
         }
     }
 }

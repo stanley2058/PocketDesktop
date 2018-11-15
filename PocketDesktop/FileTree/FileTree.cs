@@ -100,7 +100,7 @@ namespace PocketDesktop.FileTree
             root.GetChilds().ForEach(c =>
             {
                 var path = Path.GetFileNameWithoutExtension(c.GetVal());
-                if (path != null && path.Contains(target))
+                if (path != null && path.ToLower().Contains(target.ToLower()))
                     _searchNodeList.Add(c);
                 if (!c.IsLeaf())
                     SearchInTree(c, target);

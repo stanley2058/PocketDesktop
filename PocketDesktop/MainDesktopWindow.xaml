@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:PocketDesktop"
              x:Class="PocketDesktop.MainDesktopWindow"
              mc:Ignorable="d" 
-             d:DesignHeight="512" d:DesignWidth="512" Width="512" Height="512" AllowsTransparency="True" WindowStyle="None" BorderThickness="0" Visibility="Visible" Background="{x:Null}" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+             d:DesignHeight="512" d:DesignWidth="512" Width="512" Height="512" AllowsTransparency="True" WindowStyle="None" BorderThickness="0" Visibility="Visible" Background="{x:Null}" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" ShowInTaskbar="False" Topmost="True">
 
     <Window.Resources>
         <Style  x:Key="RoundLabel" TargetType="Label">
@@ -62,9 +62,9 @@
                     <RowDefinition></RowDefinition>
                 </Grid.RowDefinitions>
             </Grid>
-            <Grid Name="SettingGear" Background="White" HorizontalAlignment="Left" Height="30" Margin="430,27,0,0" VerticalAlignment="Top" Width="30" MouseDown="SettingGear_MouseDown" IsManipulationEnabled="True">
+            <Border Name="SettingGear" CornerRadius="90" Background="Brown" HorizontalAlignment="Left" Height="38" Width="38" Margin="425,30,0,0" VerticalAlignment="Top" MouseDown="SettingGear_MouseDown" IsManipulationEnabled="True">
                 <Image Name="SettingGearImg" IsManipulationEnabled="True" Height="30" Width="30" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-            </Grid>
+            </Border>
         </Grid>
     </Border>
 </Window>
