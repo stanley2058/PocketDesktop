@@ -50,6 +50,9 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>resource\slime.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Properties\Settings.settings">
@@ -129,6 +132,7 @@
   <ItemGroup>
     <Content Include="resource\folder-icon.png" />
     <Content Include="resource\gear.png" />
+    <Content Include="resource\slime.ico" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="IWshRuntimeLibrary">
