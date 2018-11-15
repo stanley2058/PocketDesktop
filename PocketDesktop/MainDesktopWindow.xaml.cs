@@ -17,6 +17,7 @@ namespace PocketDesktop
     {
         private readonly List<List<KeyValuePair<AppObj, Label>>> _appObjList;
         private readonly Tree _fileTree;
+        private SettingMenu _settingMenu;
 
         public MainDesktopWindow()
         {
@@ -24,6 +25,7 @@ namespace PocketDesktop
 
             _appObjList = new List<List<KeyValuePair<AppObj, Label>>>();
             _fileTree = new Tree();
+            _settingMenu = new SettingMenu();
 
             InitMagnify();
             InitAppIcons();
@@ -130,6 +132,10 @@ namespace PocketDesktop
                         _fileTree.OpenDir(app.GetPath());
                         ShowPage();
                     }
+                    else
+                    {
+                        Visibility = Visibility.Hidden;
+                    }
         }
 
         private void InitMagnify()
@@ -153,15 +159,10 @@ namespace PocketDesktop
         private void AppPanel_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0) // Wheel up
-            {
                 _fileTree.PrevLine();
-                ShowPage();
-            }
             else // Wheel down
-            {
                 _fileTree.NextLine();
-                ShowPage();
-            }
+            ShowPage();
         }
 
         private void AppPanel_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -179,12 +180,15 @@ namespace PocketDesktop
         private void SearchInput_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (SearchInput.Text.Equals(""))
-            {
                 _fileTree.UnSearch();
-            }
             else
                 _fileTree.Search(SearchInput.Text);
             ShowPage();
+        }
+
+        private void SettingGear_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            _settingMenu.Visibility = Visibility.Visible;
         }
     }
 }
