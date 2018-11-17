@@ -8,7 +8,7 @@ namespace PocketDesktop.FileTree
 {
     public class FileTree
     {
-        private readonly TreeNode<string> _treeRoot;
+        private TreeNode<string> _treeRoot;
         private TreeNode<string> _curRoot;
         private readonly List<string> _orderList;
         private int _skipped;
@@ -20,6 +20,15 @@ namespace PocketDesktop.FileTree
             _treeRoot = new TreeNode<string>(null, new List<TreeNode<string>>(), "root");
             _orderList = new List<string>();
             _searchNodeList = new List<TreeNode<string>>();
+            InitTree();
+            InitOrderList(_treeRoot);
+        }
+
+        public void Reload()
+        {
+            _treeRoot = new TreeNode<string>(null, new List<TreeNode<string>>(), "root");
+            _orderList.Clear();
+            _searchNodeList.Clear();
             InitTree();
             InitOrderList(_treeRoot);
         }

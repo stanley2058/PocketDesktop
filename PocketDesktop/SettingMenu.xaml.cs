@@ -5,9 +5,11 @@ namespace PocketDesktop
 {
     public partial class SettingMenu
     {
-        public SettingMenu()
+        private readonly MainDesktopWindow _parent;
+        public SettingMenu(MainDesktopWindow parent)
         {
             InitializeComponent();
+            _parent = parent;
             Hide();
             Topmost = true;
         }
@@ -20,6 +22,11 @@ namespace PocketDesktop
         private void BtnExit_OnClick(object sender, RoutedEventArgs e)
         {
             Environment.Exit(0);
+        }
+
+        private void BtnReload_OnClick(object sender, RoutedEventArgs e)
+        {
+            _parent.Reload();
         }
     }
 }

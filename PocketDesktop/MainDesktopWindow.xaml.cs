@@ -24,7 +24,7 @@ namespace PocketDesktop
         private readonly List<List<KeyValuePair<AppObj, Label>>> _appObjList;
         private readonly Tree _fileTree;
         private readonly SettingMenu _settingMenu;
-        private readonly HotkeyBinder _hotkeyBinder;
+        private readonly HotkeyBinder _hotKeyBinder;
         private bool _initFlag;
 
         public MainDesktopWindow()
@@ -35,8 +35,8 @@ namespace PocketDesktop
 
             _appObjList = new List<List<KeyValuePair<AppObj, Label>>>();
             _fileTree = new Tree();
-            _settingMenu = new SettingMenu();
-            _hotkeyBinder = new HotkeyBinder();
+            _settingMenu = new SettingMenu(this);
+            _hotKeyBinder = new HotkeyBinder();
 
             InitImage(SearchIcon, "magnify");
             InitImage(SettingGearImg, "gear");
@@ -49,7 +49,7 @@ namespace PocketDesktop
 
         private void BindHotKey()
         {
-            _hotkeyBinder.Bind(Modifiers.Shift ^ Modifiers.Win, Keys.D).To(() =>
+            _hotKeyBinder.Bind(Modifiers.Shift ^ Modifiers.Win, Keys.D).To(() =>
             {
                 if (!IsVisible || _initFlag)
                     Show();
@@ -60,8 +60,8 @@ namespace PocketDesktop
 
         private void UnBindHotKey()
         {
-            if (_hotkeyBinder.IsHotkeyAlreadyBound(new Hotkey(Modifiers.None, Keys.Escape)))
-                _hotkeyBinder.Unbind(Modifiers.None, Keys.Escape);
+            if (_hotKeyBinder.IsHotkeyAlreadyBound(new Hotkey(Modifiers.None, Keys.Escape)))
+                _hotKeyBinder.Unbind(Modifiers.None, Keys.Escape);
         }
 
         private new void Show()
@@ -71,7 +71,7 @@ namespace PocketDesktop
                 Visibility = Visibility.Visible;
                 _initFlag = false;
             }
-            _hotkeyBinder.Bind(Modifiers.None, Keys.Escape).To(EscapeKeyEvent);
+            _hotKeyBinder.Bind(Modifiers.None, Keys.Escape).To(EscapeKeyEvent);
             base.Show();
         }
 
@@ -79,6 +79,12 @@ namespace PocketDesktop
         {
             UnBindHotKey();
             base.Hide();
+        }
+
+        public void Reload()
+        {
+            _fileTree.Reload();
+            ShowPage();
         }
 
         private void EscapeKeyEvent()
