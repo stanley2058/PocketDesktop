@@ -71,6 +71,7 @@ namespace PocketDesktop
                 Visibility = Visibility.Visible;
                 _initFlag = false;
             }
+            EscapeKeyEvent();
             _hotKeyBinder.Bind(Modifiers.None, Keys.Escape).To(EscapeKeyEvent);
             base.Show();
         }
@@ -90,6 +91,7 @@ namespace PocketDesktop
         private void EscapeKeyEvent()
         {
             SearchInput.Text = "";
+            SearchInput.Focus();
             _fileTree.GoHome();
             ShowPage();
         }
