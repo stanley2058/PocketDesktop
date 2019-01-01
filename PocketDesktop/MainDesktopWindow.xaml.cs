@@ -74,6 +74,7 @@ namespace PocketDesktop
             EscapeKeyEvent();
             _hotKeyBinder.Bind(Modifiers.None, Keys.Escape).To(EscapeKeyEvent);
             base.Show();
+            Focus();
         }
 
         private new void Hide()
