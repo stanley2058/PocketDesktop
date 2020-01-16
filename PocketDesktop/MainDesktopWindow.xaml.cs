@@ -71,12 +71,6 @@ namespace PocketDesktop
                 else
                     Hide();
             });
-
-            for (var i = 0; i < _digitHotkeys.Length; ++i)
-            {
-                int row = i / 3, col = i % 3;
-                _hotKeyBinder.Bind(_digitHotkeys[i]).To(() => { StartApp(row, col); });
-            }
         }
 
         private void UnBindHotKey()
@@ -99,6 +93,12 @@ namespace PocketDesktop
 
             EscapeKeyEvent();
             _hotKeyBinder.Bind(Modifiers.None, Keys.Escape).To(EscapeKeyEvent);
+            for (var i = 0; i < _digitHotkeys.Length; ++i)
+            {
+                int row = i / 3, col = i % 3;
+                _hotKeyBinder.Bind(_digitHotkeys[i]).To(() => { StartApp(row, col); });
+            }
+
             base.Show();
             PocketDesktop.CenterWindow(this);
             Activate();
