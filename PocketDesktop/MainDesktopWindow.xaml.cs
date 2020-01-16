@@ -1,5 +1,7 @@
 ﻿using Shortcut;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -26,6 +28,19 @@ namespace PocketDesktop
         private readonly SettingMenu _settingMenu;
         private readonly HotkeyBinder _hotKeyBinder;
         private bool _initFlag;
+
+        private readonly Hotkey[] _digitHotkeys =
+        {
+            new Hotkey(Modifiers.Control, Keys.D1),
+            new Hotkey(Modifiers.Control, Keys.D2),
+            new Hotkey(Modifiers.Control, Keys.D3),
+            new Hotkey(Modifiers.Control, Keys.D4),
+            new Hotkey(Modifiers.Control, Keys.D5),
+            new Hotkey(Modifiers.Control, Keys.D6),
+            new Hotkey(Modifiers.Control, Keys.D7),
+            new Hotkey(Modifiers.Control, Keys.D8),
+            new Hotkey(Modifiers.Control, Keys.D9)
+        };
 
         public MainDesktopWindow()
         {
@@ -56,12 +71,22 @@ namespace PocketDesktop
                 else
                     Hide();
             });
+
+            for (var i = 0; i < _digitHotkeys.Length; ++i)
+            {
+                int row = i / 3, col = i % 3;
+                _hotKeyBinder.Bind(_digitHotkeys[i]).To(() => { StartApp(row, col); });
+            }
         }
 
         private void UnBindHotKey()
         {
             if (_hotKeyBinder.IsHotkeyAlreadyBound(new Hotkey(Modifiers.None, Keys.Escape)))
                 _hotKeyBinder.Unbind(Modifiers.None, Keys.Escape);
+
+            foreach (var t in _digitHotkeys)
+                if (_hotKeyBinder.IsHotkeyAlreadyBound(t))
+                    _hotKeyBinder.Unbind(t);
         }
 
         private new void Show()
@@ -71,9 +96,11 @@ namespace PocketDesktop
                 Visibility = Visibility.Visible;
                 _initFlag = false;
             }
+
             EscapeKeyEvent();
             _hotKeyBinder.Bind(Modifiers.None, Keys.Escape).To(EscapeKeyEvent);
             base.Show();
+            PocketDesktop.CenterWindow(this);
             Activate();
             Focus();
         }
@@ -81,6 +108,7 @@ namespace PocketDesktop
         private new void Hide()
         {
             UnBindHotKey();
+            _settingMenu.Hide();
             base.Hide();
         }
 
@@ -172,7 +200,7 @@ namespace PocketDesktop
                             }
                         }
                     };
-                    border.MouseLeftButtonDown += MouseClickOnApp;
+                    border.MouseDown += MouseClickOnApp;
 
                     AppPanel.Children.Add(border);
                     Grid.SetColumn(border, j);
@@ -191,13 +219,24 @@ namespace PocketDesktop
 
             if (!(VisualTreeHelper.GetChild(border, 0) is Grid grid)) return;
             for (var i = 0; i < VisualTreeHelper.GetChildrenCount(grid); i++)
-                if (VisualTreeHelper.GetChild(grid, i) is AppObj app)
-                    if (!app.StartApp())
+            {
+                if (!(VisualTreeHelper.GetChild(grid, i) is AppObj app)) continue;
+
+                if (!app.StartApp())
+                {
+                    if (e.MiddleButton == MouseButtonState.Pressed)
+                    {
+                        Process.Start(app.GetPath());
+                        Hide();
+                    }
+                    else
                     {
                         _fileTree.OpenDir(app.GetPath());
                         ShowPage();
                     }
-                    else Hide();
+                }
+                else Hide();
+            }
         }
 
         private static void InitImage(Image toMod, string prop)
@@ -248,9 +287,34 @@ namespace PocketDesktop
             ShowPage();
         }
 
+        private void SearchInput_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            // Start first app
+            if (e.Key == Key.Enter) StartApp(0, 0);
+        }
+
         private void SettingGear_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            PocketDesktop.CenterWindow(_settingMenu);
             _settingMenu.Show();
+        }
+
+        private void StartApp(int row, int col)
+        {
+            try
+            {
+                if (_appObjList[row][col].Key.StartApp())
+                {
+                    Hide();
+                    return;
+                }
+                _fileTree.OpenDir(_appObjList[row][col].Key.GetPath());
+                ShowPage();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+            }
         }
     }
 }

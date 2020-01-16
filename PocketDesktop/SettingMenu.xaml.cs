@@ -27,6 +27,7 @@ namespace PocketDesktop
         private void BtnReload_OnClick(object sender, RoutedEventArgs e)
         {
             _parent.Reload();
+            Hide();
         }
     }
 }

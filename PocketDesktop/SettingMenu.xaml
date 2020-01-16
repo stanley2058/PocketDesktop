@@ -8,8 +8,8 @@
         mc:Ignorable="d"
         d:DesignHeight="300" d:DesignWidth="450" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True" Width="450" Height="300" BorderThickness="2" BorderBrush="DarkBlue">
     <Grid Background="LightSteelBlue">
-        <Button x:Name="BtnClose" Height="30" Width="70" Content="Close" FontSize="18" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,100,10" Foreground="Black" Click="BtnClose_Click"/>
+        <Button x:Name="BtnClose" Height="30" Width="30" Content="X" FontSize="18" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,258" Foreground="White" Click="BtnClose_Click" Background="Red" BorderBrush="#00080808"/>
         <Button x:Name="BtnExit" Height="30" Width="70" Content="Exit" FontSize="18" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" Foreground="Black" Click="BtnExit_OnClick"/>
-        <Button x:Name="BtnReload" Height="30" Width="70" Content="Reload" FontSize="18" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,190,10" Foreground="Black" Click="BtnReload_OnClick"/>
+        <Button x:Name="BtnReload" Height="30" Width="70" Content="Reload" FontSize="18" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,91,10" Foreground="Black" Click="BtnReload_OnClick"/>
     </Grid>
 </Window>

@@ -13,7 +13,7 @@ namespace PocketDesktop.ApplicationObject
         {
             _appPath = appPath;
             Source = IconGetter.GetIconBitmapImage(appPath);
-            ToolTip = GetPath();
+            ToolTip = GetPath().Replace(PocketDesktop.WorkFolder, "");
         }
 
         public string GetName() => Path.GetFileNameWithoutExtension(_appPath);
