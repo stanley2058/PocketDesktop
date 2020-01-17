@@ -28,6 +28,8 @@ namespace PocketDesktop
         private readonly SettingMenu _settingMenu;
         private readonly HotkeyBinder _hotKeyBinder;
         private bool _initFlag;
+        private Queue<string> _historyQueue;
+        private int _peekIndex;
 
         private readonly Hotkey[] _digitHotkeys =
         {
@@ -52,6 +54,7 @@ namespace PocketDesktop
             _fileTree = new Tree();
             _settingMenu = new SettingMenu(this);
             _hotKeyBinder = new HotkeyBinder();
+            _historyQueue = new Queue<string>();
 
             InitImage(SearchIcon, "magnify");
             InitImage(SettingGearImg, "gear");
@@ -59,10 +62,67 @@ namespace PocketDesktop
 
             ShowPage();
             SearchInput.Focus();
-            BindHotKey();
+            BindUniversalHotKey();
+            ReadSetting();
+            ReadHistory();
         }
 
-        private void BindHotKey()
+        public void Reload()
+        {
+            _fileTree.Reload();
+            ShowPage();
+        }
+
+        public void SaveSetting()
+        {
+            var fPath = Environment.CurrentDirectory + "/setting.ini";
+            if (File.Exists(fPath)) File.Delete(fPath);
+            using (var sw = new StreamWriter(fPath))
+            {
+                var opVal = BackgroundBorder.Opacity.ToString("0.#0");
+                sw.WriteLine($"opacity={opVal}");
+            }
+        }
+
+        private void ReadSetting()
+        {
+            var fPath = Environment.CurrentDirectory + "/setting.ini";
+            if (!File.Exists(fPath)) return;
+            using (var sr = new StreamReader(fPath))
+            {
+                var str = sr.ReadLine();
+                if (str != null) BackgroundBorder.Opacity = double.Parse(str.Split('=')[1]);
+            }
+        }
+
+        private void UpdateHistiory(string appName)
+        {
+            var fPath = Environment.CurrentDirectory + "/history.ini";
+            _historyQueue.Enqueue(appName);
+            while (_historyQueue.Count > 20) _historyQueue.Dequeue();
+
+            if (File.Exists(fPath)) File.Delete(fPath);
+
+            using (var writer = new StreamWriter(fPath))
+                foreach (var app in _historyQueue)
+                    if (app.Trim() != "")
+                        writer.WriteLine(app.Trim());
+        }
+
+        private void ReadHistory()
+        {
+            var fPath = Environment.CurrentDirectory + "/history.ini";
+            if (!File.Exists(fPath)) return;
+            using (var reader = new StreamReader(fPath))
+            {
+                var histories = reader.ReadToEnd().Replace("\r", "").Split('\n');
+                var list = new List<string>(histories);
+                list.RemoveAt(list.Count - 1);
+                _historyQueue = new Queue<string>(list);
+            }
+        }
+
+        private void BindUniversalHotKey()
         {
             _hotKeyBinder.Bind(Modifiers.Shift ^ Modifiers.Win, Keys.D).To(() =>
             {
@@ -73,10 +133,37 @@ namespace PocketDesktop
             });
         }
 
+        private void BindHotKey()
+        {
+            _hotKeyBinder.Bind(Modifiers.None, Keys.Escape).To(EscapeKeyEvent);
+            _hotKeyBinder.Bind(Modifiers.None, Keys.Up).To(() =>
+            {
+                if (_peekIndex < _historyQueue.Count - 1) ++_peekIndex;
+                SearchInput.Text = _historyQueue.ToArray()[_peekIndex];
+
+            });
+            _hotKeyBinder.Bind(Modifiers.None, Keys.Down).To(() =>
+            {
+                if (_peekIndex > -1) --_peekIndex;
+                SearchInput.Text = _peekIndex == -1 ? "" : _historyQueue.ToArray()[_peekIndex];
+            });
+
+            for (var i = 0; i < _digitHotkeys.Length; ++i)
+            {
+                int row = i / 3, col = i % 3;
+                _hotKeyBinder.Bind(_digitHotkeys[i]).To(() => { StartApp(row, col); });
+            }
+        }
+
         private void UnBindHotKey()
         {
             if (_hotKeyBinder.IsHotkeyAlreadyBound(new Hotkey(Modifiers.None, Keys.Escape)))
                 _hotKeyBinder.Unbind(Modifiers.None, Keys.Escape);
+
+            if (_hotKeyBinder.IsHotkeyAlreadyBound(new Hotkey(Modifiers.None, Keys.Up)))
+                _hotKeyBinder.Unbind(Modifiers.None, Keys.Up);
+            if (_hotKeyBinder.IsHotkeyAlreadyBound(new Hotkey(Modifiers.None, Keys.Down)))
+                _hotKeyBinder.Unbind(Modifiers.None, Keys.Down);
 
             foreach (var t in _digitHotkeys)
                 if (_hotKeyBinder.IsHotkeyAlreadyBound(t))
@@ -85,6 +172,7 @@ namespace PocketDesktop
 
         private new void Show()
         {
+            _peekIndex = -1;
             if (_initFlag)
             {
                 Visibility = Visibility.Visible;
@@ -92,12 +180,7 @@ namespace PocketDesktop
             }
 
             EscapeKeyEvent();
-            _hotKeyBinder.Bind(Modifiers.None, Keys.Escape).To(EscapeKeyEvent);
-            for (var i = 0; i < _digitHotkeys.Length; ++i)
-            {
-                int row = i / 3, col = i % 3;
-                _hotKeyBinder.Bind(_digitHotkeys[i]).To(() => { StartApp(row, col); });
-            }
+            BindHotKey();
 
             base.Show();
             PocketDesktop.CenterWindow(this);
@@ -110,12 +193,6 @@ namespace PocketDesktop
             UnBindHotKey();
             _settingMenu.Hide();
             base.Hide();
-        }
-
-        public void Reload()
-        {
-            _fileTree.Reload();
-            ShowPage();
         }
 
         private void EscapeKeyEvent()
@@ -235,7 +312,11 @@ namespace PocketDesktop
                         ShowPage();
                     }
                 }
-                else Hide();
+                else
+                {
+                    UpdateHistiory(app.GetName());
+                    Hide();
+                }
             }
         }
 
@@ -306,6 +387,7 @@ namespace PocketDesktop
                 if (_appObjList[row][col].Key.StartApp())
                 {
                     Hide();
+                    UpdateHistiory(_appObjList[row][col].Key.GetName());
                     return;
                 }
                 _fileTree.OpenDir(_appObjList[row][col].Key.GetPath());
