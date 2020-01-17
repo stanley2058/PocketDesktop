@@ -138,14 +138,14 @@ namespace PocketDesktop
             _hotKeyBinder.Bind(Modifiers.None, Keys.Escape).To(EscapeKeyEvent);
             _hotKeyBinder.Bind(Modifiers.None, Keys.Up).To(() =>
             {
-                if (_peekIndex < _historyQueue.Count - 1) ++_peekIndex;
+                if (_peekIndex > 0) --_peekIndex;
                 SearchInput.Text = _historyQueue.ToArray()[_peekIndex];
 
             });
             _hotKeyBinder.Bind(Modifiers.None, Keys.Down).To(() =>
             {
-                if (_peekIndex > -1) --_peekIndex;
-                SearchInput.Text = _peekIndex == -1 ? "" : _historyQueue.ToArray()[_peekIndex];
+                if (_peekIndex < _historyQueue.Count) ++_peekIndex;
+                SearchInput.Text = _peekIndex == _historyQueue.Count ? "" : _historyQueue.ToArray()[_peekIndex];
             });
 
             for (var i = 0; i < _digitHotkeys.Length; ++i)
@@ -172,7 +172,7 @@ namespace PocketDesktop
 
         private new void Show()
         {
-            _peekIndex = -1;
+            _peekIndex = _historyQueue.Count;
             if (_initFlag)
             {
                 Visibility = Visibility.Visible;
