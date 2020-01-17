@@ -19,9 +19,12 @@ The hotkey binder used in this project is from *AlexArchive's* great creation [S
 + Press the gear icon on the right top to open setting window.
 + Press **Reload** button in setting window to reload showing apps.
 + Press **Exit** button in setting window to exit the app.
-
-### New Features
 + Press ```<Enter>``` to start first app or open first folder.
 + Press ```<Ctrl>``` + DigitKey to start app. (NumKeys will not work) \
   eg. ```<Ctrl>``` + ```<2>``` to start second app.
 + Middle click on a folder will open it in Windows File Explorer.
+
+### New Features
++ ArrowUp and ArrowDown can scroll through history app.
++ Confirm on exit.
++ Opacity slider.
