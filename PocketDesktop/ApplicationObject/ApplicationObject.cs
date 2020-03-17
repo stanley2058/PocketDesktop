@@ -45,7 +45,22 @@ namespace PocketDesktop.ApplicationObject
         public bool StartApp() // return ture if start successfully
         {
             if (IsDir()) return false;
-            Process.Start(_appPath);
+            try
+            {
+                Process.Start(_appPath);
+            }
+            catch (Exception ex1)
+            {
+                try
+                {
+                    Process.Start(GetTruePath());
+                }
+                catch (Exception ex2)
+                {
+                    Console.WriteLine(ex1);
+                    Console.WriteLine(ex2);
+                }
+            }
             return true;
         }
     }

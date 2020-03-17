@@ -97,6 +97,12 @@ namespace PocketDesktop
 
         private void UpdateHistiory(string appName)
         {
+            if (_historyQueue.Contains(appName))
+            {
+                var list = new List<string>(_historyQueue.ToArray());
+                list.Remove(appName);
+                _historyQueue = new Queue<string>(list);
+            }
             var fPath = Environment.CurrentDirectory + "/history.ini";
             _historyQueue.Enqueue(appName);
             while (_historyQueue.Count > 20) _historyQueue.Dequeue();
