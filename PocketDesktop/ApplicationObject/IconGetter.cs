@@ -1,6 +1,6 @@
 ﻿using IWshRuntimeLibrary;
+using PocketDesktop.Properties;
 using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -12,38 +12,47 @@ namespace PocketDesktop.ApplicationObject
 {
     public static class IconGetter
     {
-        private static readonly Bitmap FolderIcon = (Bitmap)Properties.Resources.ResourceManager.GetObject("folder_icon");
+        private static readonly Bitmap FolderIcon = (Bitmap)Resources.ResourceManager.GetObject("folder_icon");
         public static BitmapImage GetIconBitmapImage(string path)
         {
             path = path.Replace("/", "\\");
-            if (path.EndsWith(".lnk"))
-                path = GetExePathFromInk(path);
             var bitmap = FolderIcon;
-            try
-            {
-                if (!File.GetAttributes(path).HasFlag(FileAttributes.Directory))
-                {
-                    var icon = GetIcon(path) ?? GetIconForExtension(path);
-                    if (icon == null) return null;
-                    bitmap = icon.ToBitmap();
-                }
-            }
-            catch (Exception ex1)
+            if (!File.GetAttributes(path.EndsWith(".lnk") ? GetExePathFromInk(path) : path).HasFlag(FileAttributes.Directory))
             {
                 try
                 {
-                    var icon = GetIcon(path) ?? GetIconForExtension(path);
-                    if (icon == null) return null;
-                    bitmap = icon.ToBitmap();
+                    bitmap = path.EndsWith(".lnk")
+                        ? (Icon.ExtractAssociatedIcon(path) ?? Icon.ExtractAssociatedIcon(GetExePathFromInk(path)))?.ToBitmap()
+                        : Icon.ExtractAssociatedIcon(path)?.ToBitmap();
                 }
-                catch (Exception ex2)
+                catch (Exception ex1)
                 {
-                    Trace.WriteLine(ex1.Message);
-                    Trace.WriteLine(ex2.Message);
+                    if (path.Contains("Program Files (x86)")) path = path.Replace("Program Files (x86)", "Program Files");
+                    try
+                    {
+                        bitmap = path.EndsWith(".lnk")
+                            ? (Icon.ExtractAssociatedIcon(path) ?? Icon.ExtractAssociatedIcon(GetExePathFromInk(path)))?.ToBitmap()
+                            : Icon.ExtractAssociatedIcon(path)?.ToBitmap();
+                    }
+                    catch (Exception ex2)
+                    {
+                        try
+                        {
+                            Icon icon;
+                            if (path.EndsWith(".lnk"))
+                                icon = GetIcon(path) ?? GetIcon(GetExePathFromInk(path)) ?? GetIconForExtension(path);
+                            else icon = GetIcon(path) ?? GetIconForExtension(path);
+                            if (icon == null) return null;
+                            bitmap = icon.ToBitmap();
+                        }
+                        catch (Exception ex3)
+                        {
+                            Console.WriteLine($"Error:\nCause1:\n{ex1}\nCause2:\n{ex2}\nCause3:\n{ex3}\n\n");
+                        }
+                    }
                 }
+
             }
-
-
 
             using (var memory = new MemoryStream())
             {
@@ -68,7 +77,7 @@ namespace PocketDesktop.ApplicationObject
             public string szDisplayName;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
             public string szTypeName;
-        };
+        }
 
         // DLL Import
         [DllImport("shell32")]
@@ -82,12 +91,13 @@ namespace PocketDesktop.ApplicationObject
         // Constants/Enums
         private const int FILE_ATTRIBUTE_NORMAL = 0x80;
 
-        private enum SHGetFileInfoConstants : int
+        [Flags]
+        private enum ShGetFileInfoConstants
         {
-            SHGFI_ICON = 0x100,                // get icon
-            SHGFI_TYPENAME = 0x400,            // get type name
-            SHGFI_SHELLICONSIZE = 0x4,         // get shell size icon
-            SHGFI_USEFILEATTRIBUTES = 0x10,    // use passed dwFileAttribute
+            ShgfiIcon = 0x100,                // get icon
+            ShgfiTypename = 0x400,            // get type name
+            ShgfiShelliconsize = 0x4,         // get shell size icon
+            ShgfiUsefileattributes = 0x10    // use passed dwFileAttribute
         }
 
         private static Icon GetIconForExtension(string extension)
@@ -99,10 +109,10 @@ namespace PocketDesktop.ApplicationObject
                 FILE_ATTRIBUTE_NORMAL,
                 ref shinfo, (uint)Marshal.SizeOf(shinfo),
                 (int)(
-                SHGetFileInfoConstants.SHGFI_ICON |
-                SHGetFileInfoConstants.SHGFI_SHELLICONSIZE |
-                SHGetFileInfoConstants.SHGFI_USEFILEATTRIBUTES |
-                SHGetFileInfoConstants.SHGFI_TYPENAME
+                ShGetFileInfoConstants.ShgfiIcon |
+                ShGetFileInfoConstants.ShgfiShelliconsize |
+                ShGetFileInfoConstants.ShgfiUsefileattributes |
+                ShGetFileInfoConstants.ShgfiTypename
                 ));
             Icon icon = Icon.FromHandle(shinfo.hIcon).Clone() as Icon;
             DestroyIcon(shinfo.hIcon);
@@ -115,7 +125,13 @@ namespace PocketDesktop.ApplicationObject
         {
             var shell = new WshShell();
             var shortcut = (WshShortcut)shell.CreateShortcut(path);
-            return shortcut.TargetPath;
+
+            if (File.Exists(shortcut.TargetPath)) return shortcut.TargetPath;
+            if (shortcut.TargetPath.Contains("Program Files (x86)") && File.Exists(shortcut.TargetPath.Replace("Program Files (x86)", "Program Files")))
+                return shortcut.TargetPath.Replace("Program Files (x86)", "Program Files");
+            if (shortcut.TargetPath.Contains("Program Files") && !shortcut.TargetPath.Contains("Program Files (x86)") && File.Exists(shortcut.TargetPath.Replace("Program Files", "Program Files (x86)")))
+                return shortcut.TargetPath.Replace("Program Files", "Program Files (x86)");
+            return null;
         }
 
         [DllImport("Shell32.dll", EntryPoint = "SHDefExtractIconW")]

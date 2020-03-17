@@ -20,14 +20,13 @@ namespace PocketDesktop.ApplicationObject
 
         public string GetPath() => _appPath;
 
+        public string GetTruePath() => IconGetter.GetExePathFromInk(_appPath);
+
         public bool IsDir()
         {
-            if (_appPath.EndsWith(".lnk"))
-                _appPath = IconGetter.GetExePathFromInk(_appPath);
-
             try
             {
-                return File.GetAttributes(_appPath).HasFlag(FileAttributes.Directory);
+                return File.GetAttributes(_appPath.EndsWith(".lnk") ? GetTruePath() : _appPath).HasFlag(FileAttributes.Directory);
             }
             catch (Exception ex)
             {
