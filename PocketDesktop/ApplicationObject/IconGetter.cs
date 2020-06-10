@@ -17,7 +17,8 @@ namespace PocketDesktop.ApplicationObject
         {
             path = path.Replace("/", "\\");
             var bitmap = FolderIcon;
-            if (!File.GetAttributes(path.EndsWith(".lnk") ? GetExePathFromInk(path) : path).HasFlag(FileAttributes.Directory))
+            var tmpPath = path.EndsWith(".lnk") ? GetExePathFromInk(path) : path;
+            if (!File.GetAttributes(tmpPath ?? path).HasFlag(FileAttributes.Directory))
             {
                 try
                 {
