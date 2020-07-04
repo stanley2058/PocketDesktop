@@ -72,7 +72,7 @@ namespace PocketDesktop.FileTree
                 var nodeName = node.GetVal();
                 if (nodeName.EndsWith(".lnk"))
                     nodeName = IconGetter.GetExePathFromInk(nodeName);
-                if (!nodeName.Equals(dir)) continue;
+                if (nodeName == null || !nodeName.Equals(dir)) continue;
                 InitOrderList(_curRoot = node);
                 _skipped = 0;
             }
